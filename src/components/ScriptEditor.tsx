@@ -33,9 +33,11 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
       
       let prompt = "";
       if (isPlaceholder) {
-        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Crie uma descrição visual detalhada e interessante para um quadro de quadrinho (HQ).
+        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Crie uma descrição visual condensada e interessante para um quadro de quadrinho (HQ).
 
-CONTEXTO DA PÁGINA:
+CONTEXTO OBRIGATÓRIO DO QUADRO:
+- Enquadramento Exigido: "${panel.framing || "Plano médio"}"
+- Movimento de Câmera: "${panel.cameraMovement || "Estática"}"
 - Ritmo/Pacing desta Página: "${activePage?.rhythmNotes || "Não especificado"}"
 - Argumento Geral da História: "${project.settings.premise || "Não especificado"}"
 
@@ -45,12 +47,20 @@ REGRAS CRÍTICAS DE RETORNO:
 - Retorne apenas o parágrafo da descrição em si.
 
 REGRAS DE CONTEÚDO:
-1. GERAÇÃO A PARTIR DO CONTEXTO: Use o "Ritmo/Pacing desta Página" para gerar uma descrição visual inédita e detalhada para este quadro.
-2. CONCISÃO E ESSÊNCIA: Seja direto, evite floreios literários desnecessários. Vá direto aos detalhes visuais essenciais que o desenhista precisa para ilustrar.
+1. RESPEITO ABSOLUTO AO ENQUADRAMENTO: A descrição deve se basear e demonstrar visualmente o enquadramento exigido ("${panel.framing || "Plano médio"}"). 
+   - Se for "Contra-plongée", descreva os elementos vistos de baixo para cima, enfatizando a imponência/altura.
+   - Se for "Plongée", descreva a cena vista de cima para baixo.
+   - Se for "Close-up", descreva detalhes específicos e rostos de forma aproximada.
+   - Nunca use expressões contraditórias (ex: não comece com "Plano geral..." se o enquadramento exigido for "Contra-plongée" ou "Close-up", adapte a perspectiva da linguagem).
+2. CONCISÃO E ESSÊNCIA (CRÍTICO): Seja extremamente conciso, direto e focado no essencial (máximo de 3 linhas ou 2 parágrafos curtos densos). Evite floreios poéticos longos.
 3. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente (ex: "Manoel observa a chuva..." em vez de "observava").
 4. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia).`;
       } else {
-        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Seu trabalho é reescrever, detalhar e enriquecer visualmente a descrição de cena para um quadro de quadrinhos (HQ) que o usuário já começou a esboçar.
+        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Seu trabalho é reescrever e aprimorar visualmente a descrição de cena para um quadro de quadrinhos (HQ) que o usuário já esboçou.
+
+CONTEXTO OBRIGATÓRIO DO QUADRO:
+- Enquadramento Exigido: "${panel.framing || "Plano médio"}"
+- Movimento de Câmera: "${panel.cameraMovement || "Estática"}"
 
 REGRAS CRÍTICAS DE RETORNO:
 - Retorne EXCLUSIVAMENTE o texto final da descrição visual aprimorada.
@@ -58,10 +68,15 @@ REGRAS CRÍTICAS DE RETORNO:
 - Retorne apenas o parágrafo da descrição em si.
 
 REGRAS DE CONTEÚDO:
-1. FOCO EXCLUSIVO NO TEXTO FORNECIDO: Aprimore, detalhe e embeleze estritamente o que foi descrito pelo usuário. NÃO adicione personagens, locais, prédios ou elementos narrativos novos que não estejam presentes na descrição original. Mantenha os mesmos elementos, apenas detalhando-os melhor.
-2. CONCISÃO E ESSÊNCIA: Seja direto, focado em detalhes visuais essenciais (enquadramento, luz, sombras, posição física no instante congelado).
-3. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente.
-4. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia).
+1. RESPEITO ABSOLUTO AO ENQUADRAMENTO: A descrição deve se basear e demonstrar visualmente o enquadramento exigido ("${panel.framing || "Plano médio"}").
+   - Se for "Contra-plongée", descreva a cena vista de baixo para cima, dando gigantismo/altura.
+   - Se for "Plongée", descreva a cena vista de cima para baixo.
+   - Se for "Close-up", foque em detalhes fechados.
+   - Adapte a redação original do usuário para que ela obedeça e incorpore esse ângulo. Nunca comece com "Plano geral..." se o enquadramento selecionado for "Contra-plongée" ou "Close-up".
+2. FOCO NO TEXTO DO USUÁRIO: Aprimore e detalhe o que foi descrito pelo usuário, sem adicionar elementos da história ou personagens que não estejam presentes na descrição original.
+3. CONCISÃO E ESSÊNCIA (CRÍTICO): Seja conciso e direto ao ponto (máximo de 3 linhas densas de texto). Corte palavras vazias e mantenha a essência visual e intensidade.
+4. TEMPO PRESENTE DO INDICATIVO: Descreva no presente.
+5. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia).
 
 Descrição original a ser aprimorada:
 "${panel.visualDescription}"`;
