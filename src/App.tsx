@@ -201,9 +201,11 @@ export default function App() {
         <div className="max-w-[1450px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-art-charcoal rounded flex items-center justify-center text-art-bg font-serif text-xl font-bold tracking-widest">
-              N
-            </div>
+            <img 
+              src="/icon-192.png" 
+              alt="Logo Narrativa Gráfica Pro" 
+              className="h-10 w-10 rounded object-cover border border-art-border"
+            />
             <div>
               <h1 className="text-xl font-serif font-medium text-art-charcoal tracking-wide leading-tight uppercase">
                 Narrativa Gráfica Pro
