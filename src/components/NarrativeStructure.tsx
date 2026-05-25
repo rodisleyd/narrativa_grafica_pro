@@ -49,12 +49,19 @@ export default function NarrativeStructure({
     setArgumentAiLoading(true);
     try {
       const prompt = `Você é um assistente de roteiro de quadrinhos. Melhore o argumento (sinopse/enredo corrido em prosa) abaixo de forma que a narrativa fique fluida, literária, interessante e de fácil visualização em quadros de HQs.
-REGRAS CRÍTICAS:
+
+REGRAS CRÍTICAS DE RETORNO (OBRIGATÓRIAS):
+- Retorne EXCLUSIVAMENTE o texto final do argumento aprimorado em prosa literária contínua.
+- NÃO adicione saudações, introduções (ex: "Aqui está o argumento melhorado...", "Versão aprimorada:"), notas de rodapé, notas didáticas, explicações ou comentários de qualquer tipo.
+- NÃO inclua divisões de capítulos, marcações de quadros, marcadores de tópicos (bullet points) ou qualquer caractere separador como "***".
+- Retorne apenas o texto final corrido em prosa.
+
+REGRAS DE CONTEÚDO:
 1. TEMPO PRESENTE DO INDICATIVO (OBRIGATÓRIO): Descreva toda a ação no tempo presente (ex: "Um detetive particular caminha sob a chuva..." em vez de "caminhava").
 2. TEXTO EM PROSA LITERÁRIA: Escreva o argumento como um texto contínuo em prosa (um ou dois parágrafos corridos), sem listas, sem bullet points, sem diálogos diretos estruturados e sem divisões de páginas/quadros. Mantenha o formato de prosa clássica.
 3. CONCISÃO E IMPACTO: Elimine clichês fracos, adicione mais tensionamento visual e foque na progressão da premissa.
 
-Argumento original:
+Argumento original a ser polido:
 "${argumentText}"`;
 
       const responseText = await onTriggerAi("custom", { prompt });
