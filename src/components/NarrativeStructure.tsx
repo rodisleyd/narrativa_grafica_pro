@@ -42,6 +42,35 @@ export default function NarrativeStructure({
   const [plotterTotalPages, setPlotterTotalPages] = useState(project?.settings?.totalPages || 12);
   const [plotterMethod, setPlotterMethod] = useState<NarrativeStructureMethod>(method);
   const [aiLoading, setAiLoading] = useState(false);
+  const [argumentAiLoading, setArgumentAiLoading] = useState(false);
+
+  const handleImproveArgument = async () => {
+    if (!onTriggerAi || !argumentText.trim()) return;
+    setArgumentAiLoading(true);
+    try {
+      const prompt = `Você é um assistente de roteiro de quadrinhos. Melhore o argumento (sinopse/enredo corrido em prosa) abaixo de forma que a narrativa fique fluida, literária, interessante e de fácil visualização em quadros de HQs.
+REGRAS CRÍTICAS:
+1. TEMPO PRESENTE DO INDICATIVO (OBRIGATÓRIO): Descreva toda a ação no tempo presente (ex: "Um detetive particular caminha sob a chuva..." em vez de "caminhava").
+2. TEXTO EM PROSA LITERÁRIA: Escreva o argumento como um texto contínuo em prosa (um ou dois parágrafos corridos), sem listas, sem bullet points, sem diálogos diretos estruturados e sem divisões de páginas/quadros. Mantenha o formato de prosa clássica.
+3. CONCISÃO E IMPACTO: Elimine clichês fracos, adicione mais tensionamento visual e foque na progressão da premissa.
+
+Argumento original:
+"${argumentText}"`;
+
+      const responseText = await onTriggerAi("custom", { prompt });
+      if (responseText && responseText.trim()) {
+        setArgumentText(responseText.trim());
+        if (onTriggerToast) {
+          onTriggerToast("Argumento aprimorado com IA!");
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao consultar a IA para aprimorar o argumento.");
+    } finally {
+      setArgumentAiLoading(false);
+    }
+  };
 
   // Sincronizar dados ao carregar outro projeto
   useEffect(() => {
@@ -766,9 +795,23 @@ Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para 
 
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
-                  Argumento da História
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest">
+                    Argumento da História
+                  </label>
+                  {onTriggerAi && (
+                    <button
+                      type="button"
+                      onClick={handleImproveArgument}
+                      disabled={argumentAiLoading || !argumentText.trim()}
+                      className="text-[9px] font-mono font-bold text-yellow-850 bg-yellow-50 hover:bg-yellow-100 border border-yellow-250 py-1 px-2.5 rounded transition-all cursor-pointer disabled:opacity-40 flex items-center gap-1 shrink-0 uppercase tracking-wider"
+                      title="Melhorar argumento em prosa (tempo presente) com IA"
+                    >
+                      <Sparkles className={`h-3 w-3 ${argumentAiLoading ? "animate-spin text-yellow-600" : "text-yellow-650"}`} />
+                      {argumentAiLoading ? "Aprimorando..." : "Polir Argumento"}
+                    </button>
+                  )}
+                </div>
                 <textarea
                   id="plotter-argument-input"
                   rows={6}
