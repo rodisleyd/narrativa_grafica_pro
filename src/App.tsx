@@ -538,7 +538,7 @@ export default function App() {
 
             {activeTab === "EXPORT" && (
               <div className="animate-fade-in">
-                <ExportPanel project={activeProject} />
+                <ExportPanel project={activeProject} onChange={handleUpdateProject} />
               </div>
             )}
           </div>

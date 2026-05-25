@@ -23,6 +23,7 @@ export interface ProjectSettings {
   style: string;
   premise: string;
   theme: string;
+  author?: string;
 }
 
 export interface GuidedStructure {

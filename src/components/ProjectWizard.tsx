@@ -9,6 +9,7 @@ interface ProjectWizardProps {
 export default function ProjectWizard({ onComplete }: ProjectWizardProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [format, setFormat] = useState<ProjectFormat>("HQ_CLASSICA");
   const [genre, setGenre] = useState("Ação");
   const [targetAudience, setTargetAudience] = useState("Jovem Adulto");
@@ -46,7 +47,8 @@ export default function ProjectWizard({ onComplete }: ProjectWizardProps) {
       totalPages,
       style: style || "Estilo gráfico limpo padrão",
       premise: premise || "Uma jornada extraordinária...",
-      theme: theme || "Dilemas humanos universais"
+      theme: theme || "Dilemas humanos universais",
+      author: author || "Autor não registrado"
     });
   };
 
@@ -69,20 +71,35 @@ export default function ProjectWizard({ onComplete }: ProjectWizardProps) {
 
       {step === 1 ? (
         <div className="space-y-6">
-          {/* Title row */}
-          <div>
-            <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-2">
-              Título Provisório do Roteiro *
-            </label>
-            <input
-              id="input-project-title"
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: O Corvo de Ferro, O Beijo das Sombras..."
-              className="w-full text-sm font-sans p-3 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal transition-all text-art-charcoal"
-            />
+          {/* Title and Author row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-2">
+                Título Provisório do Roteiro *
+              </label>
+              <input
+                id="input-project-title"
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ex: O Corvo de Ferro, O Beijo das Sombras..."
+                className="w-full text-sm font-sans p-3 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal transition-all text-art-charcoal"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-2">
+                Roteirista(s) / Autor(es)
+              </label>
+              <input
+                id="input-project-author"
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Ex: Will Eisner, Alan Moore..."
+                className="w-full text-sm font-sans p-3 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal transition-all text-art-charcoal"
+              />
+            </div>
           </div>
 
           {/* Formats Grid */}

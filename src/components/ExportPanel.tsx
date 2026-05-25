@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 
 interface ExportPanelProps {
   project: Project;
+  onChange: (updatedProject: Project) => void;
 }
 
 interface ParsedDialogueLine {
@@ -41,7 +42,7 @@ const parseDialogueLines = (dialogueText: string): ParsedDialogueLine[] => {
   });
 };
 
-export default function ExportPanel({ project }: ExportPanelProps) {
+export default function ExportPanel({ project, onChange }: ExportPanelProps) {
   const [exportFormat, setExportFormat] = useState<"MD" | "TXT" | "JSON" | "PDF" | "DOCX" | "FDX" | "CELTX">("MD");
   const [pdfTemplate, setPdfTemplate] = useState<"CLASSIC" | "EDITORIAL" | "STUDIO">("CLASSIC");
   const [copied, setCopied] = useState(false);
@@ -70,11 +71,17 @@ export default function ExportPanel({ project }: ExportPanelProps) {
     output += `</style>\n</head>\n<body>\n`;
     
     output += `<h1>${project.settings.title.toUpperCase()}</h1>\n`;
+    if (project.settings.author) {
+      output += `<div class="subtitle" style="font-weight: bold; margin-bottom: 5px; font-family: Arial, sans-serif; font-size: 11pt; text-align: center; color: #333;">Escrito por: ${project.settings.author}</div>\n`;
+    }
     output += `<div class="subtitle">Roteiro de Narrativa Visual / Quadrinhos</div>\n`;
     
     output += `<table class="metadata-table">\n`;
     output += `  <tr><td><strong>Formato:</strong> ${project.settings.format}</td><td><strong>Gênero:</strong> ${project.settings.genre}</td></tr>\n`;
     output += `  <tr><td><strong>Público-Alvo:</strong> ${project.settings.targetAudience}</td><td><strong>Estilo:</strong> ${project.settings.style}</td></tr>\n`;
+    if (project.settings.author) {
+      output += `  <tr><td colspan="2"><strong>Autor(es):</strong> ${project.settings.author}</td></tr>\n`;
+    }
     output += `</table>\n`;
     
     output += `<h2>Premissa Dramática</h2>\n<p>${project.settings.premise}</p>\n`;
@@ -139,6 +146,9 @@ export default function ExportPanel({ project }: ExportPanelProps) {
     xml += `  <Content>\n`;
     
     xml += `    <Paragraph Type="Scene Heading">\n      <Text>${project.settings.title.toUpperCase()} - ROTEIRO</Text>\n    </Paragraph>\n`;
+    if (project.settings.author) {
+      xml += `    <Paragraph Type="Action">\n      <Text>Autor(es): ${project.settings.author}</Text>\n    </Paragraph>\n`;
+    }
     xml += `    <Paragraph Type="Action">\n      <Text>Formato: ${project.settings.format} | Gênero: ${project.settings.genre} | Público: ${project.settings.targetAudience}</Text>\n    </Paragraph>\n`;
     xml += `    <Paragraph Type="Action">\n      <Text>Premissa: ${project.settings.premise}</Text>\n    </Paragraph>\n`;
     
@@ -201,7 +211,11 @@ export default function ExportPanel({ project }: ExportPanelProps) {
     
     html += `<div class="title-page">\n`;
     html += `  <div class="title">${project.settings.title.toUpperCase()}</div>\n`;
-    html += `  <div class="author">Roteiro de HQ por Narrativa Gráfica Pro</div>\n`;
+    if (project.settings.author) {
+      html += `  <div class="author">Escrito por: ${project.settings.author}</div>\n`;
+    } else {
+      html += `  <div class="author">Roteiro de HQ por Narrativa Gráfica Pro</div>\n`;
+    }
     html += `  <div class="author">Formato: ${project.settings.format} | Gênero: ${project.settings.genre}</div>\n`;
     html += `</div>\n`;
     html += `<hr style="page-break-after: always; visibility: hidden; border: none;" />\n`;
@@ -252,6 +266,9 @@ export default function ExportPanel({ project }: ExportPanelProps) {
 
   const generateMarkdownFormat = (): string => {
     let output = `# Roteiro: ${project.settings.title}\n`;
+    if (project.settings.author) {
+      output += `**Autor(es)**: ${project.settings.author}\n\n`;
+    }
     output += `**Formato**: ${project.settings.format} | **Gênero**: ${project.settings.genre}\n`;
     output += `**Público-Alvo**: ${project.settings.targetAudience} | **Estilo Proposto**: ${project.settings.style}\n\n`;
     output += `## Premissa\n${project.settings.premise}\n\n`;
@@ -284,6 +301,9 @@ export default function ExportPanel({ project }: ExportPanelProps) {
   const generateTxtFormat = (): string => {
     let output = `==========================================================\n`;
     output += `           ROTEIRO DE QUADRINHOS: ${project.settings.title.toUpperCase()}\n`;
+    if (project.settings.author) {
+      output += `           AUTOR(ES): ${project.settings.author.toUpperCase()}\n`;
+    }
     output += `==========================================================\n\n`;
     output += `Formato: ${project.settings.format}\n`;
     output += `Gênero: ${project.settings.genre} | Público: ${project.settings.targetAudience}\n\n`;
@@ -398,7 +418,11 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         // Page 1 Cover Sheet
         y = 45;
         printText(project.settings.title.toUpperCase(), 105, 150, 24, 10, "courier", "bold", [20, 20, 20], true);
-        y += 12;
+        y += 10;
+        if (project.settings.author) {
+          printText(`Escrito por: ${project.settings.author}`, 105, 150, 12, 6, "courier", "bold", [40, 40, 40], true);
+          y += 2;
+        }
         printText(`Formato: ${project.settings.format} | Gênero: ${project.settings.genre}`, 105, 150, 11, 6, "courier", "italic", [80, 80, 80], true);
         printText(`Público Alvo: ${project.settings.targetAudience}`, 105, 150, 11, 5, "courier", "normal", [80, 80, 80], true);
         y += 20;
@@ -479,6 +503,10 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         y = 45;
         printText(project.settings.title.toUpperCase(), 105, 150, 26, 12, "helvetica", "bold", [17, 24, 39], true);
         y += 10;
+        if (project.settings.author) {
+          printText(`Autor(es): ${project.settings.author}`, 105, 150, 12, 6, "helvetica", "bold", [51, 65, 85], true);
+          y += 2;
+        }
         printText(`Formato Editoral: ${project.settings.format} • Gênero Literário: ${project.settings.genre}`, 105, 150, 11, 6, "helvetica", "italic", [100, 116, 139], true);
         printText(`Estilo Solicitado: ${project.settings.style}`, 105, 150, 10.5, 5, "helvetica", "normal", [100, 116, 139], true);
         y += 18;
@@ -561,6 +589,10 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         y = 45;
         printText(project.settings.title.toUpperCase(), 105, 150, 24, 11, "helvetica", "bold", [15, 23, 42], true);
         y += 10;
+        if (project.settings.author) {
+          printText(`Escrito por: ${project.settings.author}`, 105, 150, 11, 6, "helvetica", "bold", [71, 85, 105], true);
+          y += 2;
+        }
         printText(`FOLHA TÉCNICA DE PRODUÇÃO GRÁFICA`, 105, 150, 10, 6, "helvetica", "bold", [100, 116, 139], true);
         printText(`Gênero: ${project.settings.genre} • Formato: ${project.settings.format}`, 105, 150, 10, 6, "helvetica", "normal", [100, 116, 139], true);
         y += 15;
@@ -842,6 +874,51 @@ export default function ExportPanel({ project }: ExportPanelProps) {
           >
             JSON
           </button>
+        </div>
+      </div>
+
+      {/* Dados de Identificação do Roteiro */}
+      <div className="bg-art-sidebar/25 border border-art-border rounded p-4 shadow-3xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
+              Título do Roteiro
+            </label>
+            <input
+              type="text"
+              value={project.settings.title}
+              onChange={(e) => {
+                onChange({
+                  ...project,
+                  settings: {
+                    ...project.settings,
+                    title: e.target.value
+                  }
+                });
+              }}
+              className="w-full text-xs font-serif p-2.5 bg-art-card border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
+              Roteirista(s) / Autor(es)
+            </label>
+            <input
+              type="text"
+              value={project.settings.author || ""}
+              onChange={(e) => {
+                onChange({
+                  ...project,
+                  settings: {
+                    ...project.settings,
+                    author: e.target.value
+                  }
+                });
+              }}
+              placeholder="Digite o nome do(s) roteirista(s)..."
+              className="w-full text-xs font-serif p-2.5 bg-art-card border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal"
+            />
+          </div>
         </div>
       </div>
 
