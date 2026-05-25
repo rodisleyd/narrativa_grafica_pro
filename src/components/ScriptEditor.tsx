@@ -30,30 +30,42 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
     setDescAiLoading(true);
     try {
       const isPlaceholder = panel.visualDescription.includes("Rascunhe os primeiros movimentos");
-      const prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Reescreva, detalhe e aprimore a descrição visual do quadro de quadrinho (HQ) abaixo.
+      
+      let prompt = "";
+      if (isPlaceholder) {
+        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Crie uma descrição visual detalhada e interessante para um quadro de quadrinho (HQ).
 
-CONTEXTO GERAL DO ROTEIRO:
-- Argumento Geral da História: "${project.settings.premise || "Não especificado"}"
+CONTEXTO DA PÁGINA:
 - Ritmo/Pacing desta Página: "${activePage?.rhythmNotes || "Não especificado"}"
+- Argumento Geral da História: "${project.settings.premise || "Não especificado"}"
+
+REGRAS CRÍTICAS DE RETORNO:
+- Retorne EXCLUSIVAMENTE o texto final da descrição visual gerada.
+- NÃO adicione saudações, introduções (ex: "Aqui está sua descrição"), explicações, justificativas ou notas didáticas de qualquer tipo.
+- Retorne apenas o parágrafo da descrição em si.
+
+REGRAS DE CONTEÚDO:
+1. GERAÇÃO A PARTIR DO CONTEXTO: Use o "Ritmo/Pacing desta Página" para gerar uma descrição visual inédita e detalhada para este quadro.
+2. CONCISÃO E ESSÊNCIA: Seja direto, evite floreios literários desnecessários. Vá direto aos detalhes visuais essenciais que o desenhista precisa para ilustrar.
+3. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente (ex: "Manoel observa a chuva..." em vez de "observava").
+4. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia).`;
+      } else {
+        prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Seu trabalho é reescrever, detalhar e enriquecer visualmente a descrição de cena para um quadro de quadrinhos (HQ) que o usuário já começou a esboçar.
 
 REGRAS CRÍTICAS DE RETORNO:
 - Retorne EXCLUSIVAMENTE o texto final da descrição visual aprimorada.
-- NÃO adicione saudações, introduções (ex: "Aqui está sua descrição"), explicações, justificativas ou notas didáticas de qualquer tipo.
-- NÃO inclua títulos ou marcações como "QUADRO 1" ou "Descrição:". Retorne apenas o parágrafo da descrição em si.
+- NÃO adicione saudações, introduções (ex: "Aqui está a descrição visual melhorada:"), explicações, justificativas ou notas didáticas de qualquer tipo.
+- Retorne apenas o parágrafo da descrição em si.
 
 REGRAS DE CONTEÚDO:
-1. CONCISÃO E ESSÊNCIA: Seja direto, evite floreios literários desnecessários. Vá direto aos detalhes visuais essenciais que o desenhista precisa para ilustrar.
-2. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente (ex: "Manoel observa a chuva..." em vez de "observava").
-3. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia). Nunca descreva uma sucessão temporal de ações (ex: em vez de "ela entra e senta", use "ela está sentada").
-4. MANTENHA A INTENÇÃO: Preserve a ideia principal, o clima e a intenção do roteiro original.
-${
-  isPlaceholder
-    ? `5. GERAÇÃO A PARTIR DO CONTEXTO: Como a descrição original é apenas um rascunho de placeholder genérico, use o "Argumento Geral" e principalmente o "Ritmo/Pacing desta Página" acima para sugerir e criar uma descrição visual específica de alta qualidade para este quadro.`
-    : `5. APERFEIÇOAMENTO: Melhore e dê mais robustez visual ao texto fornecido.`
-}
+1. FOCO EXCLUSIVO NO TEXTO FORNECIDO: Aprimore, detalhe e embeleze estritamente o que foi descrito pelo usuário. NÃO adicione personagens, locais, prédios ou elementos narrativos novos que não estejam presentes na descrição original. Mantenha os mesmos elementos, apenas detalhando-os melhor.
+2. CONCISÃO E ESSÊNCIA: Seja direto, focado em detalhes visuais essenciais (enquadramento, luz, sombras, posição física no instante congelado).
+3. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente.
+4. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia).
 
-Descrição original a ser reescrita ou substituída:
+Descrição original a ser aprimorada:
 "${panel.visualDescription}"`;
+      }
 
       const result = await onTriggerAi("custom", { prompt });
       if (result && result.trim()) {
