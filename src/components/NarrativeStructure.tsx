@@ -224,10 +224,13 @@ Argumento original:
           sentences.length - 1
         );
         
-        // Coloca a frase do argumento apenas no início proporcional daquela seção de páginas.
-        // As páginas subsequentes do mesmo bloco usam apenas as orientações do beat correspondente.
-        const firstPageOfBlock = Math.floor(sentenceIdx / sentences.length * pagesCount) + 1;
-        if (pNum === firstPageOfBlock || sentences.length >= pagesCount) {
+        // Calcula o índice do bloco da página anterior.
+        // A frase do argumento só é incluída no início de cada novo bloco (quando o índice muda).
+        const prevSentenceIdx = pNum > 1
+          ? Math.min(Math.floor((pNum - 2) / pagesCount * sentences.length), sentences.length - 1)
+          : -1;
+          
+        if (sentenceIdx !== prevSentenceIdx || sentences.length >= pagesCount) {
           customText = sentences[sentenceIdx];
         }
       }
