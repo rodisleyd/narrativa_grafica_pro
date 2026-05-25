@@ -230,15 +230,20 @@ Argumento da história: "${argumentText}"
 Número de ${isStrip ? "Quadros" : "Páginas"} desejado: ${plotterTotalPages}
 Estrutura Narrativa base de roteiro: ${plotterMethod}
 
+DIRETRIZES IMPORTANTES PARA A DESCRIÇÃO DE CADA ${unitNameUpper}:
+1. TEMPO PRESENTE OBRIGATÓRIO: Toda descrição de ação nos quadros/páginas deve ser escrita estritamente no tempo presente (ex: "Juju segura o tapete", e não "Juju segurava" ou "estendeu").
+2. INSTANTÂNEO VISUAL ESTÁTICO (FOTOGRAFIA): Quadrinhos/HQs são formados por imagens estáticas. Cada descrição de ${unitName} deve retratar um ÚNICO instante congelado no tempo, focado no que o desenhista/ilustrador deve ilustrar naquela única cena. NÃO descreva uma sucessão temporal de ações dinâmicas contínuas (ex: evite "Juju estende o tapete, depois aponta com entusiasmo e em seguida chama o gato Tico", pois isso descreve múltiplos momentos dinâmicos de animação ou filme; prefira descrever o arranjo visual estático unificado: "Juju, sorridente em roupas de ginástica, aponta com entusiasmo para o tapete de yoga estendido no chão da sala de estar, chamando pelo gato Tico que a observa deitado sob o sofá com tédio").
+3. CONCISO E VISUAL: Foque nas expressões faciais, pose/posição física dos personagens no ambiente, enquadramento implícito e objetos ao redor.
+
 Por favor, gere exatamente ${plotterTotalPages} ${unitLabel}.
 Retorne sua resposta estritamente no seguinte formato estruturado de texto, repetido para cada ${unitName} (sem introdução nem conclusão na resposta):
 
 ${unitNameUpper} X: [Nome da Batida] (Intensidade: [Baixa/Média/Alta/Clímax])
-Descrição: [Escreva aqui o que acontece neste ${unitName} de forma concisa e específica ao argumento fornecido]
+Descrição: [Escreva a descrição estática da cena no tempo presente seguindo as diretrizes acima]
 
 Exemplo para ${unitName} 1:
 ${unitNameUpper} 1: ${isStrip ? "Situação Inicial / Premissa" : "Introdução & Status Quo"} (Intensidade: Baixa)
-Descrição: ${isStrip ? "Juju mostra um tapete de yoga animada e chama o gato Tico." : "Apresentação do detetive Manoel sob a fumaça de cigarro e o clima sombrio do seu escritório."}`;
+Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para o tapete de yoga colorido estendido na sala de estar, enquanto o gato Tico a observa deitado no sofá com desinteresse." : "O detetive Manoel, com olhar cansado, observa a chuva caindo do lado de fora da janela de vidro do seu escritório escuro, segurando uma caneca de café com fumaça."}`;
 
       const responseText = await onTriggerAi("custom", { prompt });
       const pages: LocalPageBeat[] = [];
