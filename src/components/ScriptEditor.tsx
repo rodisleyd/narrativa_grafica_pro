@@ -29,13 +29,19 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
     if (!onTriggerAi || !panel.visualDescription?.trim()) return;
     setDescAiLoading(true);
     try {
-      const prompt = `Você é um assistente de roteiro de quadrinhos. Melhore e reescreva a descrição visual do quadro abaixo de acordo com as seguintes regras críticas:
-1. TEMPO PRESENTE OBRIGATÓRIO (presente do indicativo): A ação e o estado dos elementos devem ser descritos estritamente no tempo presente (ex: "Manoel observa a chuva..." em vez de "observava" ou "observou").
-2. IMAGEM ESTÁTICA (CONGELADA): Quadrinhos são formados por imagens estáticas (um instantâneo no tempo). NÃO descreva uma sucessão temporal de ações consecutivas (ex: evite "Ele entra na sala, pega o copo e bebe"; prefira "Ele segura um copo de vidro próximo à boca, com olhar tenso voltado para a porta da sala").
-3. CONCISO E VISUAL: Descreva poses, expressões faciais, o posicionamento dos elementos no espaço, luzes e sombras de forma direta para ajudar o desenhista a ilustrar.
-4. MANTENHA A INTENÇÃO: Preserve rigorosamente a ideia, clima e intenção originais que o roteirista quis transmitir.
+      const prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Reescreva e aprimore a descrição visual do quadro de quadrinho (HQ) abaixo.
+REGRAS CRÍTICAS DE RETORNO:
+- Retorne EXCLUSIVAMENTE o texto final da descrição visual aprimorada.
+- NÃO adicione saudações, introduções (ex: "Aqui está sua descrição"), explicações, justificativas ou notas didáticas de qualquer tipo.
+- NÃO inclua títulos ou marcações como "QUADRO 1" ou "Descrição:". Retorne apenas o parágrafo da descrição em si.
 
-Descrição original:
+REGRAS DE CONTEÚDO:
+1. CONCISÃO E ESSÊNCIA: Seja direto, evite floreios literários desnecessários. Vá direto aos detalhes visuais essenciais que o desenhista precisa para ilustrar.
+2. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente (ex: "Manoel observa a chuva..." em vez de "observava").
+3. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia). Nunca descreva uma sucessão temporal de ações (ex: em vez de "ela entra e senta", use "ela está sentada").
+4. MANTENHA A INTENÇÃO: Preserve a ideia principal, o clima e a intenção do roteiro original.
+
+Descrição original a ser reescrita:
 "${panel.visualDescription}"`;
 
       const result = await onTriggerAi("custom", { prompt });
