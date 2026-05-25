@@ -406,7 +406,7 @@ Descrição original a ser aprimorada:
   };
 
   return (
-    <div id="script-editor-studio" className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1550px] mx-auto text-xs">
+    <div id="script-editor-studio" className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-none text-xs">
       
       {/* 1. Sidebar Panel: Page List Tree / Rhythm Notes */}
       <div className="lg:col-span-3 bg-art-card border border-art-border rounded p-4 h-fit space-y-4 shadow-3xs">

@@ -155,7 +155,7 @@ export default function EduCenter({ onApplyReference }: EduCenterProps) {
     : filteredLessons[0] || null;
 
   return (
-    <div id="edu-center" className="bg-art-card border border-art-border rounded p-6 max-w-7xl mx-auto shadow-sm text-xs">
+    <div id="edu-center" className="bg-art-card border border-art-border rounded p-6 max-w-none shadow-sm text-xs">
       {/* Target header info to explain purpose */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-art-border pb-5 mb-6 gap-4">
         <div>

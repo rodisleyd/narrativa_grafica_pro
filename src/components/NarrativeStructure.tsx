@@ -614,7 +614,7 @@ Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para 
   };
 
   return (
-    <div id="narrative-structure" className="bg-art-card border border-art-border rounded p-6 max-w-7xl mx-auto text-xs">
+    <div id="narrative-structure" className="bg-art-card border border-art-border rounded p-6 max-w-none text-xs">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-art-border pb-4 mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-serif font-bold text-art-charcoal flex items-center gap-2">

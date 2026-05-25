@@ -136,7 +136,7 @@ export default function NarrativeAnalyzer({ project }: NarrativeAnalyzerProps) {
   };
 
   return (
-    <div id="narrative-analyzer" className="bg-art-card border border-art-border rounded p-6 max-w-7xl mx-auto space-y-6 text-xs shadow-sm">
+    <div id="narrative-analyzer" className="bg-art-card border border-art-border rounded p-6 max-w-none space-y-6 text-xs shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-art-border pb-4 mb-2 gap-4">
         <div>
           <h2 className="text-2xl font-serif font-bold text-art-charcoal flex items-center gap-2">

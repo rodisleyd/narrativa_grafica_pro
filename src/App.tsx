@@ -207,7 +207,7 @@ export default function App() {
       
       {/* 1. Global Clean Header */}
       <header className="bg-art-card border-b border-art-border py-4 px-6 shadow-xs sticky top-0 z-40">
-        <div className="max-w-[1450px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="max-w-none px-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           
           <div className="flex items-center gap-3">
             <img 
@@ -272,7 +272,7 @@ export default function App() {
       {/* 2. Horizontal Navigation Bar */}
       {!showWizard && (
         <nav className="bg-art-card border-b border-art-border sticky top-[73px] z-30 shadow-2xs">
-          <div className="max-w-[1450px] mx-auto px-4 md:px-6 flex flex-wrap items-center justify-between gap-4 py-1">
+          <div className="max-w-none px-6 md:px-12 flex flex-wrap items-center justify-between gap-4 py-1">
             <div className="flex flex-wrap gap-1">
               {sidebarTabs.map((tb) => {
                 const IconComp = tb.icon;
@@ -318,7 +318,7 @@ export default function App() {
       )}
 
       {/* 4. Main Workspace Scaffold wrapper */}
-      <main className="flex-1 max-w-[1450px] w-full mx-auto px-4 md:px-6 py-6 flex flex-col gap-6">
+      <main className="flex-1 max-w-none w-full px-6 md:px-12 py-6 flex flex-col gap-6">
         
         {showWizard ? (
           /* Create new project Wizard Board container */
