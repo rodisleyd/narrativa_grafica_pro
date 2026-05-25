@@ -123,6 +123,37 @@ export default function App() {
     }
   };
 
+  const handleImportProjectJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target?.result as string) as Project;
+        
+        if (!imported.id || !imported.settings || !imported.pages) {
+          throw new Error("Arquivo JSON não contém a estrutura de projeto válida do Narrativa Gráfica Pro.");
+        }
+        
+        const validatedProject: Project = {
+          ...imported,
+          id: imported.id.startsWith("proj-") ? imported.id : "proj-" + Date.now()
+        };
+
+        setProjectList((prev) => {
+          const filtered = prev.filter(p => p.id !== validatedProject.id);
+          return [validatedProject, ...filtered];
+        });
+        setActiveProjectId(validatedProject.id);
+        triggerToast(`Projeto "${validatedProject.settings.title}" importado com sucesso!`);
+      } catch (err: any) {
+        alert(`Erro na importação: ${err.message || "Formato de arquivo inválido."}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Secure API trigger helper passed to child modules
   const handleTriggerAiService = async (action: string, payload: any): Promise<string> => {
     try {
@@ -358,16 +389,29 @@ export default function App() {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => {
-                        setActiveTab("SCRIPT");
-                        triggerToast(`Retomando roteiro ativo: ${activeProject.settings.title}`);
-                      }}
-                      className="mt-6 w-full border border-art-border hover:border-art-charcoal hover:bg-art-sidebar text-art-charcoal font-sans font-bold text-xs py-3 rounded uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-3xs transition-all cursor-pointer"
-                    >
-                      <FolderOpen className="h-4 w-4" />
-                      Abrir Roteiro Ativo
-                    </button>
+                    <div className="flex gap-2 mt-6">
+                      <button
+                        onClick={() => {
+                          setActiveTab("SCRIPT");
+                          triggerToast(`Retomando roteiro ativo: ${activeProject.settings.title}`);
+                        }}
+                        className="flex-1 border border-art-border hover:border-art-charcoal hover:bg-art-sidebar text-art-charcoal font-sans font-bold text-xs py-3 rounded uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-3xs transition-all cursor-pointer"
+                      >
+                        <FolderOpen className="h-4 w-4" />
+                        Abrir Ativo
+                      </button>
+                      
+                      <label className="border border-art-border hover:border-art-charcoal hover:bg-art-sidebar text-art-charcoal font-sans font-bold text-[10px] py-3 px-3 rounded uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-3xs transition-all cursor-pointer shrink-0">
+                        <Download className="h-4 w-4 rotate-180 text-art-charcoal" />
+                        Importar
+                        <input
+                          type="file"
+                          accept=".json"
+                          onChange={handleImportProjectJson}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   {/* Card 3: Escola & Referências */}
