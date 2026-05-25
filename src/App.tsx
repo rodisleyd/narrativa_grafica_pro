@@ -164,9 +164,18 @@ export default function App() {
           action,
           prompt: payload.prompt,
           projectContext: {
+            title: activeProject.settings.title,
             format: activeProject.settings.format,
             genre: activeProject.settings.genre,
-            style: activeProject.settings.style
+            style: activeProject.settings.style,
+            premise: activeProject.settings.premise,
+            theme: activeProject.settings.theme,
+            characters: activeProject.characters && activeProject.characters.length > 0
+              ? activeProject.characters.map(c => `${c.name} (${c.archetype}): ${c.objective}`).join("; ")
+              : undefined,
+            world: activeProject.world 
+              ? `Era: ${activeProject.world.era}, Tecnologia: ${activeProject.world.technology}, Regras do Mundo: ${activeProject.world.worldRules}`
+              : undefined
           }
         })
       });

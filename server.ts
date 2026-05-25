@@ -37,6 +37,25 @@ app.post("/api/ai/creative", async (req, res) => {
     
     // Prepare prompt according to the selected action
     let systemInstruction = "Você é um assistente criativo profissional e didático de histórias em quadrinhos (HQs), tirinhas e mangás. Escreva em português brasileiro de forma inspiradora e técnica.";
+    
+    if (action === "dialogues") {
+      systemInstruction = "Você é um roteirista profissional de quadrinhos e mangás. Reescreva falas de forma limpa, direta, natural e impactante. Escreva em português brasileiro.";
+    }
+
+    if (projectContext) {
+      let contextString = `\n\n[CONTEXTO DO PROJETO INTERNO PARA REFERÊNCIA]\n`;
+      if (projectContext.title) contextString += `- Título: ${projectContext.title}\n`;
+      if (projectContext.premise) contextString += `- Argumento Geral (Sinopse/Premissa): ${projectContext.premise}\n`;
+      if (projectContext.genre) contextString += `- Gênero: ${projectContext.genre}\n`;
+      if (projectContext.format) contextString += `- Formato: ${projectContext.format}\n`;
+      if (projectContext.style) contextString += `- Estilo Gráfico: ${projectContext.style}\n`;
+      if (projectContext.theme) contextString += `- Tema Moral: ${projectContext.theme}\n`;
+      if (projectContext.characters) contextString += `- Elenco Principal (Personagens): ${projectContext.characters}\n`;
+      if (projectContext.world) contextString += `- Ambientação e Regras: ${projectContext.world}\n`;
+      contextString += `--------------------------------------------------\n\nUse as informações do contexto acima para garantir que suas respostas, sugestões de desenho, diálogos e correções sejam estritamente consistentes com os personagens, regras do mundo e enredo estabelecido pelo roteirista.`;
+      systemInstruction += contextString;
+    }
+
     let userPrompt = "";
 
     switch (action) {
@@ -47,7 +66,6 @@ app.post("/api/ai/creative", async (req, res) => {
         userPrompt = `Sugira 3 conflitos dramáticos intensos ou reviravoltas de roteiro baseando-se no contexto de história: "${prompt}".`;
         break;
       case "dialogues":
-        systemInstruction = "Você é um roteirista profissional de quadrinhos e mangás. Reescreva falas de forma limpa, direta, natural e impactante. Escreva em português brasileiro.";
         userPrompt = `Melhore e reescreva o diálogo abaixo de forma a torná-lo mais natural, dramático ou engraçado (conforme o estilo apropriado), com economia textual e subtexto.
 ATENÇÃO: Retorne EXCLUSIVAMENTE o texto do diálogo reescrito. Não adicione nenhuma explicação, introdução, múltiplas opções, formatação em tópicos, notas visuais, nem formatação markdown adicional. Retorne apenas a fala final. Se a fala original tiver o nome de um personagem indicando quem fala (ex: "HERÓI: fala"), mantenha o mesmo formato no retorno (ex: "HERÓI: fala melhorada").
 
