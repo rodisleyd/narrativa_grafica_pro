@@ -20,9 +20,35 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
   const [selectedCompTechnique, setSelectedCompTechnique] = useState<number | null>(null);
 
   const [aiLoading, setAiLoading] = useState(false);
+  const [descAiLoading, setDescAiLoading] = useState(false);
   const [aiSelectedField, setAiSelectedField] = useState<"dialogue" | "sfx" | "description">("dialogue");
 
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
+
+  const handleAiDescriptionImprove = async (panel: Panel) => {
+    if (!onTriggerAi || !panel.visualDescription?.trim()) return;
+    setDescAiLoading(true);
+    try {
+      const prompt = `Você é um assistente de roteiro de quadrinhos. Melhore e reescreva a descrição visual do quadro abaixo de acordo com as seguintes regras críticas:
+1. TEMPO PRESENTE OBRIGATÓRIO (presente do indicativo): A ação e o estado dos elementos devem ser descritos estritamente no tempo presente (ex: "Manoel observa a chuva..." em vez de "observava" ou "observou").
+2. IMAGEM ESTÁTICA (CONGELADA): Quadrinhos são formados por imagens estáticas (um instantâneo no tempo). NÃO descreva uma sucessão temporal de ações consecutivas (ex: evite "Ele entra na sala, pega o copo e bebe"; prefira "Ele segura um copo de vidro próximo à boca, com olhar tenso voltado para a porta da sala").
+3. CONCISO E VISUAL: Descreva poses, expressões faciais, o posicionamento dos elementos no espaço, luzes e sombras de forma direta para ajudar o desenhista a ilustrar.
+4. MANTENHA A INTENÇÃO: Preserve rigorosamente a ideia, clima e intenção originais que o roteirista quis transmitir.
+
+Descrição original:
+"${panel.visualDescription}"`;
+
+      const result = await onTriggerAi("custom", { prompt });
+      if (result && result.trim()) {
+        handleUpdatePanel(panel.id, { visualDescription: result.trim() });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao consultar a IA para aprimorar a descrição.");
+    } finally {
+      setDescAiLoading(false);
+    }
+  };
 
   // Estados locais para o construtor visual de balões de diálogo
   const [builderCharName, setBuilderCharName] = useState("");
@@ -516,7 +542,20 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                 {/* Column Left: Visuals & Framing */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[9px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">Descrição Visual da Imagem</label>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-[9px] font-mono font-bold text-stone-550 uppercase tracking-widest">Descrição Visual da Imagem</label>
+                      {onTriggerAi && (
+                        <button
+                          type="button"
+                          onClick={() => handleAiDescriptionImprove(activePanel)}
+                          disabled={descAiLoading || !activePanel.visualDescription?.trim()}
+                          className="bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-250 p-1.5 rounded transition-all cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center h-6 w-6"
+                          title="Polir descrição do quadro com IA (tempo presente e estática)"
+                        >
+                          <Sparkles className={`h-3 w-3 ${descAiLoading ? "animate-spin text-yellow-600" : "text-yellow-650"}`} />
+                        </button>
+                      )}
+                    </div>
                     <textarea
                       rows={3}
                       value={activePanel.visualDescription}
@@ -804,10 +843,23 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                 {/* Core common script inputs */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[9px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5 flex justify-between items-center mt-0.5">
+                    <div className="block text-[9px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5 flex justify-between items-center mt-0.5">
                       <span>Descrição Visual da Imagem</span>
-                      <span className="text-[8px] tracking-wider text-art-charcoal bg-art-sidebar px-1.5 py-0.5 rounded font-mono font-bold uppercase">Direção de Arte</span>
-                    </label>
+                      <div className="flex items-center gap-1.5">
+                        {onTriggerAi && (
+                          <button
+                            type="button"
+                            onClick={() => handleAiDescriptionImprove(activePanel)}
+                            disabled={descAiLoading || !activePanel.visualDescription?.trim()}
+                            className="bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-250 p-1 rounded transition-all cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center h-5.5 w-5.5"
+                            title="Polir descrição do quadro com IA (tempo presente e estática)"
+                          >
+                            <Sparkles className={`h-3 w-3 ${descAiLoading ? "animate-spin text-yellow-600" : "text-yellow-650"}`} />
+                          </button>
+                        )}
+                        <span className="text-[8px] tracking-wider text-art-charcoal bg-art-sidebar px-1.5 py-0.5 rounded font-mono font-bold uppercase">Direção de Arte</span>
+                      </div>
+                    </div>
                     <textarea
                       id="input-desc-pnl"
                       rows={writeMode === "VISUAL" ? 5 : 3}
