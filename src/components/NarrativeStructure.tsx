@@ -282,7 +282,7 @@ Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para 
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const pageMatch = line.match(/^(?:PÁGINA|PAGINA|QUADRO)\s+(\d+)[:\-\s]*(.*)$/i);
+        const pageMatch = line.match(/^(?:[#\*\-\s]*)(?:PÁGINA|PAGINA|QUADRO)\s+(\d+)[:\-\s\*\(\)]*(.*)$/i);
         if (pageMatch) {
           if (currentPage.pageNumber) {
             pages.push(currentPage as LocalPageBeat);
@@ -314,8 +314,9 @@ Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para 
             intensity: intensity,
             description: ""
           };
-        } else if (line.toLowerCase().startsWith("descrição:") || line.toLowerCase().startsWith("descricao:")) {
-          const descText = line.substring(line.indexOf(":") + 1).trim();
+        } else if (/^(?:[#\*\-\s]*)(?:descrição|descricao)[:\-\s\*\(\)]*(.*)$/i.test(line)) {
+          const descMatch = line.match(/^(?:[#\*\-\s]*)(?:descrição|descricao)[:\-\s\*\(\)]*(.*)$/i);
+          const descText = descMatch ? descMatch[1].trim() : "";
           if (currentPage.pageNumber) {
             currentPage.description = descText;
           }
@@ -455,7 +456,7 @@ Descrição: ${isStrip ? "Juju, sorridente em roupas de ginástica, aponta para 
             id: "panel-" + Date.now() + "-lp-" + lp.pageNumber,
             panelNumber: 1,
             framing: "Plano médio",
-            visualDescription: "Rascunhe os primeiros movimentos físicos da cena baseando-se no ritmo acima...",
+            visualDescription: lp.description || "Rascunhe os primeiros movimentos físicos da cena baseando-se no ritmo acima...",
             dialogue: "",
             narration: "",
             soundEffects: "",
