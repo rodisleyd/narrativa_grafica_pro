@@ -23,6 +23,11 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
   const [aiSelectedField, setAiSelectedField] = useState<"dialogue" | "sfx" | "description">("dialogue");
 
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
+
+  // Estados locais para o construtor visual de balões de diálogo
+  const [builderCharName, setBuilderCharName] = useState("");
+  const [builderBalloonType, setBuilderBalloonType] = useState("FALA");
+  const [builderText, setBuilderText] = useState("");
   const handleCopyColor = (color: string) => {
     navigator.clipboard.writeText(color);
     setCopiedColor(color);
@@ -42,6 +47,28 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
       return p;
     });
     onChange({ ...project, pages: updatedPages });
+  };
+
+  const handleInsertBalloon = (panelId: string, currentDialogue: string) => {
+    const name = builderCharName.trim().toUpperCase();
+    if (!name) {
+      alert("Por favor, digite ou selecione o nome do personagem.");
+      return;
+    }
+    if (!builderText.trim()) {
+      alert("Por favor, digite o texto da fala/balão.");
+      return;
+    }
+    
+    const prefix = builderBalloonType === "FALA" ? "" : ` (${builderBalloonType})`;
+    const newline = `${name}${prefix}: ${builderText.trim()}`;
+    
+    const updated = currentDialogue 
+      ? currentDialogue.trim() + "\n" + newline 
+      : newline;
+      
+    handleUpdatePanel(panelId, { dialogue: updated });
+    setBuilderText(""); // Limpa o input de texto
   };
 
   const handleUpdatePageNotes = (notes: string) => {
@@ -198,6 +225,88 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
   const activePanel = (activePage?.panels && activePanelIdx !== null && activePage.panels[activePanelIdx])
     ? activePage.panels[activePanelIdx]
     : activePage?.panels?.[0];
+
+  const renderDialogueBuilder = (panel: Panel) => {
+    if (!panel) return null;
+    const hasCharacters = project.characters && project.characters.length > 0;
+    return (
+      <div className="bg-art-sidebar/45 border border-art-border rounded p-3 mb-2.5 space-y-2 text-left">
+        <div className="flex items-center justify-between border-b border-art-border/40 pb-1.5">
+          <span className="text-[9px] font-mono font-bold text-art-charcoal uppercase tracking-wider flex items-center gap-1">
+            <MessageSquare className="h-3.5 w-3.5 text-art-charcoal" /> Construtor de Balões
+          </span>
+          <span className="text-[8px] text-stone-500 font-serif italic">Formatador de falas e tipos de balões</span>
+        </div>
+        
+        <div className="flex flex-wrap sm:flex-nowrap gap-1.5">
+          {/* Seletor de Personagem cadastrado */}
+          {hasCharacters && (
+            <select
+              onChange={(e) => {
+                if (e.target.value !== "CUSTOM") {
+                  setBuilderCharName(e.target.value);
+                } else {
+                  setBuilderCharName("");
+                }
+              }}
+              value={project.characters.some(c => c.name === builderCharName) ? builderCharName : "CUSTOM"}
+              className="text-[10px] font-sans p-1.5 bg-art-card border border-art-border rounded focus:outline-none text-art-charcoal shrink-0"
+            >
+              <option value="CUSTOM">Personagem...</option>
+              {project.characters.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+              <option value="CUSTOM">Outro...</option>
+            </select>
+          )}
+
+          <input
+            type="text"
+            placeholder="Nome (EX: TICO)"
+            value={builderCharName}
+            onChange={(e) => setBuilderCharName(e.target.value)}
+            className="text-[10px] font-sans p-1.5 bg-art-card border border-art-border rounded focus:outline-none text-art-charcoal uppercase flex-1 min-w-[70px] sm:max-w-[110px]"
+          />
+
+          <select
+            value={builderBalloonType}
+            onChange={(e) => setBuilderBalloonType(e.target.value)}
+            className="text-[10px] font-sans p-1.5 bg-art-card border border-art-border rounded focus:outline-none text-art-charcoal shrink-0"
+          >
+            <option value="FALA">Balão de Fala 💬</option>
+            <option value="PENSAMENTO">Balão de Pensamento 💭</option>
+            <option value="GRITO">Balão de Grito ⚡</option>
+            <option value="SUSSURRO">Balão de Sussurro ░</option>
+            <option value="OFF">Voz Off-Screen (Fora) 🔇</option>
+            <option value="LEGENDA">Legenda Narrador 📜</option>
+          </select>
+        </div>
+
+        <div className="flex gap-1.5">
+          <input
+            type="text"
+            placeholder="Escreva a fala ou pensamento do personagem aqui..."
+            value={builderText}
+            onChange={(e) => setBuilderText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleInsertBalloon(panel.id, panel.dialogue || "");
+              }
+            }}
+            className="text-[10px] font-sans p-1.5 bg-art-card border border-art-border rounded focus:outline-none text-art-charcoal flex-1 placeholder-stone-400"
+          />
+          <button
+            type="button"
+            onClick={() => handleInsertBalloon(panel.id, panel.dialogue || "")}
+            className="bg-art-charcoal hover:bg-stone-850 text-art-bg font-sans font-bold text-[9px] uppercase tracking-wider py-1.5 px-3 rounded flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap animate-pulse"
+          >
+            <Plus className="h-3 w-3" /> Inserir
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div id="script-editor-studio" className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1550px] mx-auto text-xs">
@@ -431,6 +540,7 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                 <div className="space-y-4">
                   <div>
                     <label className="block text-[9px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1">Falas / Balões</label>
+                    {renderDialogueBuilder(activePanel)}
                     <textarea
                       rows={3}
                       value={activePanel.dialogue}
@@ -687,6 +797,7 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                         <span>Diálogos e Falas</span>
                         <span className="text-[8px] tracking-wider text-art-charcoal bg-art-sidebar px-1.5 py-0.5 rounded font-mono font-bold uppercase">Expressividade</span>
                       </label>
+                      {renderDialogueBuilder(activePanel)}
                       <textarea
                         id="input-dialogue-pnl"
                         rows={2}
