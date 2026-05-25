@@ -7,6 +7,40 @@ interface ExportPanelProps {
   project: Project;
 }
 
+interface ParsedDialogueLine {
+  charName: string;
+  text: string;
+}
+
+const parseDialogueLines = (dialogueText: string): ParsedDialogueLine[] => {
+  if (!dialogueText) return [];
+  const lines = dialogueText.split("\n").map(l => l.trim()).filter(Boolean);
+  
+  const formatSpeech = (txt: string) => {
+    if (txt === txt.toUpperCase()) {
+      const lowered = txt.toLowerCase();
+      return lowered.charAt(0).toUpperCase() + lowered.slice(1).replace(/(?:^[a-z]|\.\s+[a-z]|\!\s+[a-z]|\?\s+[a-z])/g, m => m.toUpperCase());
+    }
+    return txt;
+  };
+
+  return lines.map(line => {
+    let charName = "";
+    let speechText = line;
+    
+    if (line.includes(":")) {
+      const parts = line.split(":");
+      charName = parts[0].trim().toUpperCase();
+      speechText = parts.slice(1).join(":").trim();
+    }
+    
+    return {
+      charName,
+      text: formatSpeech(speechText)
+    };
+  });
+};
+
 export default function ExportPanel({ project }: ExportPanelProps) {
   const [exportFormat, setExportFormat] = useState<"MD" | "TXT" | "JSON" | "PDF" | "DOCX" | "FDX" | "CELTX">("MD");
   const [pdfTemplate, setPdfTemplate] = useState<"CLASSIC" | "EDITORIAL" | "STUDIO">("CLASSIC");
@@ -77,17 +111,15 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         }
         
         if (pnl.dialogue) {
-          let charName = "PERSONAGEM";
-          let dialogueText = pnl.dialogue;
-          if (pnl.dialogue.includes(":")) {
-            const parts = pnl.dialogue.split(":");
-            charName = parts[0].trim();
-            dialogueText = parts.slice(1).join(":").trim();
-          }
-          output += `  <div class="dialogue-container">\n`;
-          output += `    <span class="char-name">${charName.toUpperCase()}</span>\n`;
-          output += `    <span class="dialogue-text">"${dialogueText}"</span>\n`;
-          output += `  </div>\n`;
+          const dialogLines = parseDialogueLines(pnl.dialogue);
+          dialogLines.forEach((dl) => {
+            output += `  <div class="dialogue-container">\n`;
+            if (dl.charName) {
+              output += `    <span class="char-name">${dl.charName}</span>\n`;
+            }
+            output += `    <span class="dialogue-text">"${dl.text}"</span>\n`;
+            output += `  </div>\n`;
+          });
         }
         
         if (pnl.artistNotes) {
@@ -133,15 +165,13 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         }
         
         if (pnl.dialogue) {
-          let charName = "PERSONAGEM";
-          let dialogueText = pnl.dialogue;
-          if (pnl.dialogue.includes(":")) {
-            const parts = pnl.dialogue.split(":");
-            charName = parts[0].trim();
-            dialogueText = parts.slice(1).join(":").trim();
-          }
-          xml += `    <Paragraph Type="Character">\n      <Text>${charName.toUpperCase()}</Text>\n    </Paragraph>\n`;
-          xml += `    <Paragraph Type="Dialogue">\n      <Text>${dialogueText}</Text>\n    </Paragraph>\n`;
+          const dialogLines = parseDialogueLines(pnl.dialogue);
+          dialogLines.forEach((dl) => {
+            if (dl.charName) {
+              xml += `    <Paragraph Type="Character">\n      <Text>${dl.charName}</Text>\n    </Paragraph>\n`;
+            }
+            xml += `    <Paragraph Type="Dialogue">\n      <Text>${dl.text}</Text>\n    </Paragraph>\n`;
+          });
         }
         
         if (pnl.artistNotes) {
@@ -200,15 +230,13 @@ export default function ExportPanel({ project }: ExportPanelProps) {
         }
         
         if (pnl.dialogue) {
-          let charName = "PERSONAGEM";
-          let dialogueText = pnl.dialogue;
-          if (pnl.dialogue.includes(":")) {
-            const parts = pnl.dialogue.split(":");
-            charName = parts[0].trim();
-            dialogueText = parts.slice(1).join(":").trim();
-          }
-          html += `<div class="character">${charName}</div>\n`;
-          html += `<div class="dialogue">"${dialogueText}"</div>\n`;
+          const dialogLines = parseDialogueLines(pnl.dialogue);
+          dialogLines.forEach((dl) => {
+            if (dl.charName) {
+              html += `<div class="character">${dl.charName}</div>\n`;
+            }
+            html += `<div class="dialogue">"${dl.text}"</div>\n`;
+          });
         }
         
         if (pnl.artistNotes) {
@@ -428,10 +456,15 @@ export default function ExportPanel({ project }: ExportPanelProps) {
               printText(`_RECORDATÓRIO:_ "${pnl.narration}"`, 40, 130, 9.5, 5, "courier", "italic", [70, 70, 70]);
             }
             if (pnl.dialogue) {
-              y += 2;
-              printText(`${pnl.dialogue.split(":")[0]?.toUpperCase() || "PERSONAGEM"}`, 105, 100, 9.5, 5, "courier", "bold", [20, 20, 20], true);
-              const contentOnly = pnl.dialogue.includes(":") ? pnl.dialogue.substring(pnl.dialogue.indexOf(":") + 1).trim() : pnl.dialogue;
-              printText(`"${contentOnly}"`, 60, 90, 10, 5.5, "courier", "normal", [50, 50, 50]);
+              const dialogLines = parseDialogueLines(pnl.dialogue);
+              dialogLines.forEach((dl) => {
+                y += 2;
+                if (dl.charName) {
+                  printText(dl.charName, 105, 100, 9.5, 5, "courier", "bold", [20, 20, 20], true);
+                }
+                printText(`"${dl.text}"`, 60, 90, 10, 5.5, "courier", "normal", [50, 50, 50]);
+                y += 1.5;
+              });
             }
             if (pnl.artistNotes) {
               printText(`Nota Técnica de Sarjeta: ${pnl.artistNotes}`, 25, 160, 9, 5, "courier", "italic", [110, 110, 110]);
@@ -508,8 +541,12 @@ export default function ExportPanel({ project }: ExportPanelProps) {
               printText(`[Recordatório] ${pnl.narration}`, 28, 154, 9.5, 5, "helvetica", "italic", [71, 85, 105]);
             }
             if (pnl.dialogue) {
-              y += 2;
-              printText(`FALAS • ${pnl.dialogue}`, 28, 154, 10, 5.5, "helvetica", "normal", [15, 23, 42]);
+              const dialogLines = parseDialogueLines(pnl.dialogue);
+              dialogLines.forEach((dl) => {
+                y += 2;
+                const displayText = dl.charName ? `${dl.charName}: ${dl.text}` : dl.text;
+                printText(`FALAS • ${displayText}`, 28, 154, 10, 5.5, "helvetica", "normal", [15, 23, 42]);
+              });
             }
             if (pnl.artistNotes) {
               printText(`Direção ao Desenhista: ${pnl.artistNotes}`, 24, 162, 9, 5, "helvetica", "italic", [148, 163, 184]);
@@ -628,7 +665,9 @@ export default function ExportPanel({ project }: ExportPanelProps) {
               printColRight("Recordatório", pnl.narration, "italic");
             }
             if (pnl.dialogue) {
-              printColRight("Voz Dramática / Balão", pnl.dialogue);
+              const dialogLines = parseDialogueLines(pnl.dialogue);
+              const formattedText = dialogLines.map(dl => dl.charName ? `${dl.charName}: ${dl.text}` : dl.text).join("\n");
+              printColRight("Voz Dramática / Balão", formattedText);
             }
 
             y = Math.max(colLeftY, colRightY) + 4;
