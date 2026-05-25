@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@theme {
+  --font-serif: "Lora", "Georgia", serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-art-bg: #F5F2ED;
+  --color-art-sidebar: #EDE9E1;
+  --color-art-charcoal: #1A1A1A;
+  --color-art-border: #D1CDC4;
+  --color-art-card: #FDFCFB;
+  --color-art-cream-dark: #EAE6DF;
+}
+
+body {
+  background-color: var(--color-art-bg);
+  color: var(--color-art-charcoal);
+  font-family: var(--font-sans);
+}
+
+/* Base style resets to fit the organic editorial theme */
+::selection {
+  background-color: var(--color-art-charcoal);
+  color: var(--color-art-bg);
+}

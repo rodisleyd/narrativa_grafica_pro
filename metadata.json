@@ -1,0 +1,6 @@
+{
+  "name": "Narrativa Gráfica Pro",
+  "description": "Estúdio profissional para criação de roteiros de HQs, tirinhas e graphic novels com estruturação guiada e assistente IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
