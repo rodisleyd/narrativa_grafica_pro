@@ -42,7 +42,12 @@ app.post("/api/ai/creative", async (req, res) => {
         userPrompt = `Sugira 3 conflitos dramáticos intensos ou reviravoltas de roteiro baseando-se no contexto de história: "${prompt}".`;
         break;
       case "dialogues":
-        userPrompt = `Melhore e reescreva o seguinte diálogo para torná-lo mais natural, dramático ou engraçado (conforme o estilo do quadrinho), mantendo subtexto e economia textual:\n\n${prompt}`;
+        systemInstruction = "Você é um roteirista profissional de quadrinhos e mangás. Reescreva falas de forma limpa, direta, natural e impactante. Escreva em português brasileiro.";
+        userPrompt = `Melhore e reescreva o diálogo abaixo de forma a torná-lo mais natural, dramático ou engraçado (conforme o estilo apropriado), com economia textual e subtexto.
+ATENÇÃO: Retorne EXCLUSIVAMENTE o texto do diálogo reescrito. Não adicione nenhuma explicação, introdução, múltiplas opções, formatação em tópicos, notas visuais, nem formatação markdown adicional. Retorne apenas a fala final. Se a fala original tiver o nome de um personagem indicando quem fala (ex: "HERÓI: fala"), mantenha o mesmo formato no retorno (ex: "HERÓI: fala melhorada").
+
+Diálogo original:
+${prompt}`;
         break;
       case "framing":
         userPrompt = `Gere sugestões de enquadramentos e ritmo visual (pacing) para a seguinte descrição de cena de quadrinho. Explique a escolha das câmeras (plano geral, close-up, close extremo, etc.) e o fluxo de leitura:\n\n${prompt}`;
