@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NarrativeStructureMethod, GuidedStructure, Project, ScriptPage } from "../types";
+import { NarrativeStructureMethod, GuidedStructure, Project, ScriptPage, Panel } from "../types";
 import { BookOpen, Sparkles, AlertCircle, Award, CheckCircle, ChevronRight, HelpCircle, RefreshCw, Trash2, Plus, ArrowDown, ArrowUp, Wand2 } from "lucide-react";
 
 interface NarrativeStructureProps {
@@ -83,7 +83,7 @@ export default function NarrativeStructure({
     }
   }, [project?.id]);
 
-  // Métodos do Decupador de Páginas
+  // Métodos do Decupador
   const generateLocalDecupage = () => {
     const sentences = argumentText
       .split(/[.!?]+/)
@@ -120,7 +120,7 @@ export default function NarrativeStructure({
     } else if (plotterMethod === "HEROS_JOURNEY") {
       beats = [
         { name: "1. Mundo Comum", defaultDesc: "Introdução ao cotidiano comum do protagonista.", relativePosition: 0.08, intensity: "Baixa" },
-        { name: "2. Chamado à Aventura", defaultDesc: "Um convite ou problema surge.", relativePosition: 0.16, intensity: "Média" },
+        { name: "2. Chamado à Aventura", defaultDesc: "Um convite ou problem surge.", relativePosition: 0.16, intensity: "Média" },
         { name: "3. Recusa do Chamado", defaultDesc: "Hesitação ou negação de seguir em frente.", relativePosition: 0.24, intensity: "Baixa" },
         { name: "4. Encontro com o Mentor", defaultDesc: "Conselhos ou ajuda de alguém experiente.", relativePosition: 0.32, intensity: "Baixa" },
         { name: "5. Travessia do Primeiro Limiar", defaultDesc: "Entrada definitiva no mundo extraordinário.", relativePosition: 0.40, intensity: "Média" },
@@ -147,15 +147,41 @@ export default function NarrativeStructure({
         { name: "1. Status Quo", defaultDesc: "Situação inicial deste episódio.", relativePosition: 0.2, intensity: "Baixa" },
         { name: "2. Incidente Incitador", defaultDesc: "Um fator inesperado quebra a calmaria.", relativePosition: 0.4, intensity: "Média" },
         { name: "3. Complicações", defaultDesc: "Obstáculos e ações físicas crescentes.", relativePosition: 0.6, intensity: "Alta" },
-        { name: "4. Clímax", defaultDesc: "Ponto de maior tensão dramática do capítulo.", relativePosition: 0.85, intensity: "Clímax" },
+        { name: "4. Clímax", defaultDesc: "Ponto de maior tensionamento dramático do capítulo.", relativePosition: 0.85, intensity: "Clímax" },
         { name: "5. Gancho / Resolução", defaultDesc: "Resolução provisória e gancho para o próximo capítulo.", relativePosition: 1.0, intensity: "Baixa" }
       ];
     } else {
-      beats = [
-        { name: "1. Situação Inicial / Premissa", defaultDesc: "Apresenta o contexto comum e os personagens da tira.", relativePosition: 0.33, intensity: "Baixa" },
-        { name: "2. Complicação", defaultDesc: "Introduz a quebra de expectativa ou ação rápida.", relativePosition: 0.66, intensity: "Média" },
-        { name: "3. Punchline / Resolução", defaultDesc: "A revelação cômica ou irônica final.", relativePosition: 1.0, intensity: "Clímax" }
-      ];
+      // STRIP_STRUCTURE (Tirinhas)
+      if (pagesCount === 1) {
+        beats = [
+          { name: "Quadro Único: Gag / Piada Rápida", defaultDesc: "Premissa e punchline imediata.", relativePosition: 1.0, intensity: "Clímax" }
+        ];
+      } else if (pagesCount === 2) {
+        beats = [
+          { name: "Quadro 1: Situação Inicial / Premissa", defaultDesc: "Apresenta os personagens e prepara o gancho.", relativePosition: 0.5, intensity: "Baixa" },
+          { name: "Quadro 2: Punchline / Desfecho", defaultDesc: "A quebra de expectativa ou piada final.", relativePosition: 1.0, intensity: "Clímax" }
+        ];
+      } else if (pagesCount === 3) {
+        beats = [
+          { name: "Quadro 1: Situação Inicial / Premissa", defaultDesc: "Apresenta o contexto comum e os personagens da tira.", relativePosition: 0.33, intensity: "Baixa" },
+          { name: "Quadro 2: Complicação / Preparação", defaultDesc: "Introduz a quebra de expectativa ou ação rápida.", relativePosition: 0.66, intensity: "Média" },
+          { name: "Quadro 3: Punchline / Resolução", defaultDesc: "A revelação cômica ou irônica final.", relativePosition: 1.0, intensity: "Clímax" }
+        ];
+      } else {
+        beats = [];
+        for (let i = 1; i <= pagesCount; i++) {
+          const rel = i / pagesCount;
+          if (i === 1) {
+            beats.push({ name: "Quadro 1: Premissa Inicial", defaultDesc: "Configuração do cenário e introdução da piada.", relativePosition: rel, intensity: "Baixa" });
+          } else if (i === pagesCount) {
+            beats.push({ name: `Quadro ${i}: Punchline / Resolução`, defaultDesc: "Desfecho engraçado ou reviravolta expressiva.", relativePosition: rel, intensity: "Clímax" });
+          } else if (i === pagesCount - 1) {
+            beats.push({ name: `Quadro ${i}: Complicação / Ápice`, defaultDesc: "O momento que gera suspense para a piada.", relativePosition: rel, intensity: "Alta" });
+          } else {
+            beats.push({ name: `Quadro ${i}: Desenvolvimento`, defaultDesc: "Diálogo secundário ou progressão física dos personagens.", relativePosition: rel, intensity: "Média" });
+          }
+        }
+      }
     }
 
     for (let pNum = 1; pNum <= pagesCount; pNum++) {
@@ -185,7 +211,8 @@ export default function NarrativeStructure({
 
     setPlotterPages(result);
     if (onTriggerToast) {
-      onTriggerToast(`Decupagem de ${pagesCount} páginas gerada com a fórmula rápida!`);
+      const unitLabel = plotterMethod === "STRIP_STRUCTURE" ? "quadros" : "páginas";
+      onTriggerToast(`Decupagem de ${pagesCount} ${unitLabel} gerada com a fórmula rápida!`);
     }
   };
 
@@ -193,20 +220,25 @@ export default function NarrativeStructure({
     if (!onTriggerAi) return;
     setAiLoading(true);
     try {
-      const prompt = `Gere uma decupagem detalhada de roteiro de quadrinhos com base nas informações abaixo.
+      const isStrip = plotterMethod === "STRIP_STRUCTURE";
+      const unitLabel = isStrip ? "quadros" : "páginas";
+      const unitName = isStrip ? "Quadro" : "Página";
+      const unitNameUpper = isStrip ? "QUADRO" : "PÁGINA";
+
+      const prompt = `Gere uma decupagem detalhada de ${isStrip ? "tirinha (comic strip)" : "roteiro de quadrinhos"} com base nas informações abaixo.
 Argumento da história: "${argumentText}"
-Número de Páginas desejado: ${plotterTotalPages}
+Número de ${isStrip ? "Quadros" : "Páginas"} desejado: ${plotterTotalPages}
 Estrutura Narrativa base de roteiro: ${plotterMethod}
 
-Por favor, gere exatamente ${plotterTotalPages} páginas.
-Retorne sua resposta estritamente no seguinte formato estruturado de texto, repetido para cada página (sem introdução nem conclusão na resposta):
+Por favor, gere exatamente ${plotterTotalPages} ${unitLabel}.
+Retorne sua resposta estritamente no seguinte formato estruturado de texto, repetido para cada ${unitName} (sem introdução nem conclusão na resposta):
 
-PÁGINA X: [Nome da Batida] (Intensidade: [Baixa/Média/Alta/Clímax])
-Descrição: [Escreva aqui o que acontece nesta página de forma concisa e específica ao argumento fornecido]
+${unitNameUpper} X: [Nome da Batida] (Intensidade: [Baixa/Média/Alta/Clímax])
+Descrição: [Escreva aqui o que acontece neste ${unitName} de forma concisa e específica ao argumento fornecido]
 
-Exemplo para Página 1:
-PÁGINA 1: Introdução & Status Quo (Intensidade: Baixa)
-Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clima sombrio do seu escritório.`;
+Exemplo para ${unitName} 1:
+${unitNameUpper} 1: ${isStrip ? "Situação Inicial / Premissa" : "Introdução & Status Quo"} (Intensidade: Baixa)
+Descrição: ${isStrip ? "Juju mostra um tapete de yoga animada e chama o gato Tico." : "Apresentação do detetive Manoel sob a fumaça de cigarro e o clima sombrio do seu escritório."}`;
 
       const responseText = await onTriggerAi("custom", { prompt });
       const pages: LocalPageBeat[] = [];
@@ -216,7 +248,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const pageMatch = line.match(/^(?:PÁGINA|PAGINA)\s+(\d+)[:\-\s]*(.*)$/i);
+        const pageMatch = line.match(/^(?:PÁGINA|PAGINA|QUADRO)\s+(\d+)[:\-\s]*(.*)$/i);
         if (pageMatch) {
           if (currentPage.pageNumber) {
             pages.push(currentPage as LocalPageBeat);
@@ -240,7 +272,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
           }
           
           beatName = remainder.replace(/^[:\-\s]+|[:\-\s]+$/g, "").trim();
-          if (!beatName) beatName = `Página ${pNum}`;
+          if (!beatName) beatName = `${unitName} ${pNum}`;
           
           currentPage = {
             pageNumber: pNum,
@@ -282,7 +314,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
       
       setPlotterPages(cleanedPages);
       if (onTriggerToast) {
-        onTriggerToast(`Decupagem de ${cleanedPages.length} páginas gerada por IA com sucesso!`);
+        onTriggerToast(`Decupagem de ${cleanedPages.length} ${unitLabel} gerada por IA com sucesso!`);
       }
     } catch (err: any) {
       console.error(err);
@@ -297,11 +329,16 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
     const newPages = [...plotterPages];
     const insertIdx = afterPageNumber;
     
+    const isStrip = plotterMethod === "STRIP_STRUCTURE";
+    const unitName = isStrip ? "Quadro" : "Página";
+
     const newPage: LocalPageBeat = {
       pageNumber: afterPageNumber + 1,
-      beatName: "Nova Transição / Batida",
+      beatName: isStrip ? "Novo Quadro" : "Nova Transição / Batida",
       intensity: "Média",
-      description: "Descreva a ação ou desenvolvimento de enredo para esta nova página..."
+      description: isStrip 
+        ? "Descreva o que acontece visualmente neste quadro da tirinha..." 
+        : "Descreva a ação ou desenvolvimento de enredo para esta nova página..."
     };
     
     newPages.splice(insertIdx, 0, newPage);
@@ -336,37 +373,72 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
       return;
     }
 
-    const conf = confirm(
-      `Esta ação substituirá TODAS as ${project.pages.length} páginas atuais do roteiro "${project.settings.title}" pela nova decupagem de ${plotterPages.length} páginas. Seu progresso de diálogos e quadros anteriores será sobrescrito. Deseja prosseguir?`
-    );
+    const isStrip = plotterMethod === "STRIP_STRUCTURE";
+    const totalCurrentPages = project.pages.length;
+    
+    let confirmMsg = "";
+    if (isStrip) {
+      confirmMsg = `Esta ação substituirá TODAS as ${totalCurrentPages} páginas atuais do roteiro "${project.settings.title}" por uma única página contendo a tirinha de ${plotterPages.length} quadros decupados. Seu progresso anterior será sobrescrito. Deseja prosseguir?`;
+    } else {
+      confirmMsg = `Esta ação substituirá TODAS as ${totalCurrentPages} páginas atuais do roteiro "${project.settings.title}" pela nova decupagem de ${plotterPages.length} páginas. Seu progresso de diálogos e quadros anteriores será sobrescrito. Deseja prosseguir?`;
+    }
+
+    const conf = confirm(confirmMsg);
     if (!conf) return;
 
-    const newPages: ScriptPage[] = plotterPages.map(lp => ({
-      id: "page-" + Date.now() + "-" + lp.pageNumber,
-      pageNumber: lp.pageNumber,
-      rhythmNotes: `[Intensidade: ${lp.intensity.toUpperCase()}] [${lp.beatName}] ${lp.description}`,
-      panels: [
-        {
-          id: "panel-" + Date.now() + "-lp-" + lp.pageNumber,
-          panelNumber: 1,
-          framing: "Plano médio",
-          visualDescription: "Rascunhe os primeiros movimentos físicos da cena baseando-se no ritmo acima...",
-          dialogue: "",
-          narration: "",
-          soundEffects: "",
-          emotions: lp.intensity === "Clímax" ? "Tensão Máxima" : "Mistério",
-          cameraMovement: "Estática",
-          timeOfScene: "Dia",
-          artistNotes: ""
-        }
-      ]
-    }));
+    let newPages: ScriptPage[] = [];
+
+    if (isStrip) {
+      // Cria UMA ÚNICA página contendo N painéis (quadros) correspondentes a plotterPages
+      const panels: Panel[] = plotterPages.map((lp, idx) => ({
+        id: "panel-" + Date.now() + "-lp-" + lp.pageNumber,
+        panelNumber: idx + 1,
+        framing: idx === plotterPages.length - 1 ? "Close-up" : "Plano médio",
+        visualDescription: lp.description,
+        dialogue: "",
+        narration: "",
+        soundEffects: "",
+        emotions: lp.intensity === "Clímax" ? "Cômico/Expressivo" : "Curiosidade",
+        cameraMovement: "Estática",
+        timeOfScene: "Dia",
+        artistNotes: `[${lp.beatName}]`
+      }));
+
+      newPages = [{
+        id: "page-" + Date.now() + "-1",
+        pageNumber: 1,
+        rhythmNotes: `Tirinha completa com ${plotterPages.length} quadros decupados.`,
+        panels: panels
+      }];
+    } else {
+      // Lógica padrão: Cria N páginas, cada uma com 1 painel
+      newPages = plotterPages.map(lp => ({
+        id: "page-" + Date.now() + "-" + lp.pageNumber,
+        pageNumber: lp.pageNumber,
+        rhythmNotes: `[Intensidade: ${lp.intensity.toUpperCase()}] [${lp.beatName}] ${lp.description}`,
+        panels: [
+          {
+            id: "panel-" + Date.now() + "-lp-" + lp.pageNumber,
+            panelNumber: 1,
+            framing: "Plano médio",
+            visualDescription: "Rascunhe os primeiros movimentos físicos da cena baseando-se no ritmo acima...",
+            dialogue: "",
+            narration: "",
+            soundEffects: "",
+            emotions: lp.intensity === "Clímax" ? "Tensão Máxima" : "Mistério",
+            cameraMovement: "Estática",
+            timeOfScene: "Dia",
+            artistNotes: ""
+          }
+        ]
+      }));
+    }
 
     const updatedProject: Project = {
       ...project,
       settings: {
         ...project.settings,
-        totalPages: plotterPages.length,
+        totalPages: newPages.length,
         premise: argumentText
       },
       structureMethod: plotterMethod,
@@ -375,7 +447,11 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
 
     onChange(updatedProject);
     if (onTriggerToast) {
-      onTriggerToast(`Decupagem de ${plotterPages.length} páginas aplicada ao roteiro ativo com sucesso!`);
+      if (isStrip) {
+        onTriggerToast(`Tirinha com ${plotterPages.length} quadros aplicada ao roteiro ativo com sucesso!`);
+      } else {
+        onTriggerToast(`Decupagem de ${plotterPages.length} páginas aplicada ao roteiro ativo com sucesso!`);
+      }
     }
   };
 
@@ -700,21 +776,21 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
 
               <div>
                 <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1">
-                  Quantidade de Páginas: {plotterTotalPages}
+                  {plotterMethod === "STRIP_STRUCTURE" ? "Quantidade de Quadros" : "Quantidade de Páginas"}: {plotterTotalPages}
                 </label>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
-                    min={2}
-                    max={200}
+                    min={plotterMethod === "STRIP_STRUCTURE" ? 1 : 2}
+                    max={plotterMethod === "STRIP_STRUCTURE" ? 8 : 200}
                     value={plotterTotalPages}
                     onChange={(e) => setPlotterTotalPages(parseInt(e.target.value, 10))}
                     className="flex-1 accent-art-charcoal cursor-pointer"
                   />
                   <input
                     type="number"
-                    min={2}
-                    max={300}
+                    min={plotterMethod === "STRIP_STRUCTURE" ? 1 : 2}
+                    max={plotterMethod === "STRIP_STRUCTURE" ? 8 : 300}
                     value={plotterTotalPages}
                     onChange={(e) => {
                       const val = parseInt(e.target.value, 10);
@@ -777,7 +853,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
             </div>
           </div>
 
-          {/* Coluna Direita: Lista de Páginas Decupadas */}
+          {/* Coluna Direita: Lista de Páginas/Quadros Decupados */}
           <div className="lg:col-span-8 space-y-4">
             <div className="flex justify-between items-center bg-art-card border border-art-border p-4 rounded shadow-3xs">
               <div>
@@ -785,7 +861,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                   ESTRUTURA DE DESENVOLVIMENTO
                 </span>
                 <h3 className="text-sm font-serif font-bold text-art-charcoal mt-2.5 uppercase tracking-wide">
-                  Páginas Decupadas e Distribuídas
+                  {plotterMethod === "STRIP_STRUCTURE" ? "Quadros Decupados e Distribuídos" : "Páginas Decupadas e Distribuídas"}
                 </h3>
               </div>
 
@@ -804,9 +880,11 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
               <div className="bg-art-card border-2 border-dashed border-art-border rounded-lg p-12 text-center text-stone-500 space-y-4">
                 <BookOpen className="h-12 w-12 text-stone-300 mx-auto animate-pulse" />
                 <div className="space-y-1">
-                  <h4 className="font-serif font-bold text-sm text-art-charcoal uppercase">Nenhuma página decupada</h4>
+                  <h4 className="font-serif font-bold text-sm text-art-charcoal uppercase">
+                    Nenhum {plotterMethod === "STRIP_STRUCTURE" ? "quadro" : "página"} decupado
+                  </h4>
                   <p className="text-xs text-stone-500 font-serif italic max-w-md mx-auto leading-relaxed">
-                    Escreva seu argumento, defina o número de páginas na barra lateral e clique em gerar para distribuir seu enredo passo a passo!
+                    Escreva seu argumento, defina o número de {plotterMethod === "STRIP_STRUCTURE" ? "quadros" : "páginas"} na barra lateral e clique em gerar para distribuir seu enredo passo a passo!
                   </p>
                 </div>
               </div>
@@ -823,19 +901,19 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-art-border/50 pb-2">
                         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
                           <span className="h-6 px-2 bg-art-charcoal text-art-bg rounded text-[10px] font-mono font-bold flex items-center justify-center uppercase tracking-wide">
-                            Pág {page.pageNumber}
+                            {plotterMethod === "STRIP_STRUCTURE" ? "Quadro" : "Pág"} {page.pageNumber}
                           </span>
                           <input
                             type="text"
                             value={page.beatName}
                             onChange={(e) => handleUpdatePlotterPage(page.pageNumber, { beatName: e.target.value })}
-                            placeholder="Nome do Momento / Batida Dramática"
+                            placeholder={plotterMethod === "STRIP_STRUCTURE" ? "Nome do Quadro / Função Narrativa" : "Nome do Momento / Batida Dramática"}
                             className="text-xs font-serif font-bold bg-transparent border-b border-dashed border-stone-300 focus:outline-none focus:border-art-charcoal flex-1 uppercase tracking-wider text-art-charcoal py-0.5"
                           />
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          <label className="text-[9px] font-mono font-bold text-stone-550 uppercase tracking-wider">
+                          <label className="text-[9px] font-mono font-bold text-stone-555 uppercase tracking-wider">
                             Intensidade:
                           </label>
                           <select
@@ -853,7 +931,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                             <button
                               onClick={() => handleAddPlotterPage(page.pageNumber)}
                               className="p-1 hover:bg-art-sidebar hover:text-art-charcoal transition-all text-stone-400"
-                              title="Inserir página após esta"
+                              title={plotterMethod === "STRIP_STRUCTURE" ? "Inserir quadro após este" : "Inserir página após esta"}
                             >
                               <Plus className="h-3.5 w-3.5" />
                             </button>
@@ -861,7 +939,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                               <button
                                 onClick={() => handleDeletePlotterPage(page.pageNumber)}
                                 className="p-1 hover:bg-art-sidebar hover:text-red-700 transition-all text-stone-400 border-l border-art-border"
-                                title="Excluir esta página"
+                                title={plotterMethod === "STRIP_STRUCTURE" ? "Excluir este quadro" : "Excluir esta página"}
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
@@ -875,7 +953,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                         rows={2}
                         value={page.description}
                         onChange={(e) => handleUpdatePlotterPage(page.pageNumber, { description: e.target.value })}
-                        placeholder="O que acontece nesta página..."
+                        placeholder={plotterMethod === "STRIP_STRUCTURE" ? "O que acontece neste quadro da tirinha..." : "O que acontece nesta página..."}
                         className="w-full text-xs font-serif p-2.5 bg-art-sidebar/25 border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal leading-relaxed placeholder-stone-400"
                       />
                     </div>
@@ -886,7 +964,7 @@ Descrição: Apresentação do detetive Manoel sob a fumaça de cigarro e o clim
                 <div className="bg-art-sidebar/10 border border-art-border rounded p-5 space-y-3.5 shadow-3xs">
                   <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-[11px] text-stone-605 italic font-serif leading-relaxed text-center sm:text-left">
-                      Ao aplicar, as páginas criadas serão transferidas para o seu **Estúdio de Decupagem**. Suas notas de ritmo serão atualizadas com o conteúdo estruturado acima.
+                      Ao aplicar, os quadros estruturados serão transferidos para o seu **Estúdio de Decupagem**. {plotterMethod === "STRIP_STRUCTURE" ? "Uma única página será criada com todos estes quadros distribuídos." : "Suas notas de ritmo serão atualizadas com o conteúdo estruturado acima."}
                     </p>
                     <button
                       id="btn-plotter-apply-to-project"
