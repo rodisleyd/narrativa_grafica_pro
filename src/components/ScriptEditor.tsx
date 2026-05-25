@@ -28,6 +28,7 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
   const [builderCharName, setBuilderCharName] = useState("");
   const [builderBalloonType, setBuilderBalloonType] = useState("FALA");
   const [builderText, setBuilderText] = useState("");
+  const [builderAiLoading, setBuilderAiLoading] = useState(false);
   const handleCopyColor = (color: string) => {
     navigator.clipboard.writeText(color);
     setCopiedColor(color);
@@ -69,6 +70,21 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
       
     handleUpdatePanel(panelId, { dialogue: updated });
     setBuilderText(""); // Limpa o input de texto
+  };
+
+  const handleAiBuilderImprove = async () => {
+    if (!onTriggerAi || !builderText.trim()) return;
+    setBuilderAiLoading(true);
+    try {
+      const result = await onTriggerAi("dialogues", {
+        prompt: builderText
+      });
+      setBuilderText(result.trim());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBuilderAiLoading(false);
+    }
   };
 
   const handleUpdatePageNotes = (notes: string) => {
@@ -296,6 +312,17 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
             }}
             className="text-[10px] font-sans p-1.5 bg-art-card border border-art-border rounded focus:outline-none text-art-charcoal flex-1 placeholder-stone-400"
           />
+          {onTriggerAi && (
+            <button
+              type="button"
+              onClick={handleAiBuilderImprove}
+              disabled={builderAiLoading || !builderText.trim()}
+              className="bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-250 p-1.5 rounded transition-all cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+              title="Polir esta fala individual com IA"
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${builderAiLoading ? "animate-spin text-yellow-600" : "text-yellow-650"}`} />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => handleInsertBalloon(panel.id, panel.dialogue || "")}
@@ -437,8 +464,8 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                 <div className="flex-1 space-y-2.5">
                   <p className="text-xs text-stone-850 font-serif italic">"{p.visualDescription}"</p>
                   {p.dialogue && (
-                    <div className="p-2 bg-art-sidebar/30 rounded border-l-2 border-art-charcoal text-[11px] leading-relaxed italic text-stone-700 font-serif">
-                      "{p.dialogue}"
+                    <div className="p-2 bg-art-sidebar/30 rounded border-l-2 border-art-charcoal text-[11px] leading-relaxed italic text-stone-700 font-serif whitespace-pre-line">
+                      {p.dialogue}
                     </div>
                   )}
                   {p.soundEffects && (
@@ -673,9 +700,9 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
                         {p.visualDescription || <span className="text-stone-350 italic">Sem descrição ainda...</span>}
                       </p>
                       {p.dialogue && (
-                        <div className="p-3 bg-art-sidebar/20 rounded border-l-2 border-art-charcoal leading-relaxed italic font-serif text-stone-700 select-all">
+                        <div className="p-3 bg-art-sidebar/20 rounded border-l-2 border-art-charcoal leading-relaxed italic font-serif text-stone-700 select-all whitespace-pre-line">
                           <span className="font-mono not-italic font-bold text-[9px] text-stone-555 uppercase tracking-widest mr-2 block mb-1">FALAS:</span>
-                          "{p.dialogue}"
+                          {p.dialogue}
                         </div>
                       )}
                       {p.soundEffects && (

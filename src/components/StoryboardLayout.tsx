@@ -646,7 +646,7 @@ export default function StoryboardLayout({ project, onChange }: StoryboardLayout
                       <span className="text-[9.5px] font-mono font-bold text-stone-550 uppercase tracking-widest block mb-1.5">
                         Balão de Fala
                       </span>
-                      <p className="text-xs text-stone-750 font-serif italic leading-relaxed">
+                      <p className="text-xs text-stone-750 font-serif italic leading-relaxed whitespace-pre-line">
                         {activePage.panels[simPanelIdx].dialogue}
                       </p>
                     </div>
