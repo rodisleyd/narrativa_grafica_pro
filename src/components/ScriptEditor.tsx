@@ -690,7 +690,7 @@ Descrição original a ser aprimorada:
       ) : (
         /* ==================== MODO COMUM (SIMPLE / PRO / VISUAL) ==================== */
         <>
-          <div className="lg:col-span-5 space-y-4">
+          <div className="lg:col-span-4 space-y-4">
             <div className="flex justify-between items-center bg-art-card border border-art-border p-4 rounded shadow-3xs">
               <div>
                 <span className="text-[9px] font-mono font-bold text-art-bg bg-art-charcoal px-2.5 py-1 rounded">
@@ -801,7 +801,7 @@ Descrição original a ser aprimorada:
           </div>
 
           {/* 3. Right Panel: Active Panel Details Editor Panel */}
-          <div className="lg:col-span-4 bg-art-card border border-art-border rounded p-5 shadow-3xs h-fit space-y-5">
+          <div className="lg:col-span-5 bg-art-card border border-art-border rounded p-5 shadow-3xs h-fit space-y-5">
             {activePanel ? (
               <div className="space-y-5 animate-fade-in">
                 <div className="flex justify-between items-center border-b border-art-border pb-3">
