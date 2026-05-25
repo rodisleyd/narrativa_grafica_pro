@@ -223,7 +223,13 @@ Argumento original:
           Math.floor((pNum - 1) / pagesCount * sentences.length),
           sentences.length - 1
         );
-        customText = sentences[sentenceIdx];
+        
+        // Coloca a frase do argumento apenas no início proporcional daquela seção de páginas.
+        // As páginas subsequentes do mesmo bloco usam apenas as orientações do beat correspondente.
+        const firstPageOfBlock = Math.floor(sentenceIdx / sentences.length * pagesCount) + 1;
+        if (pNum === firstPageOfBlock || sentences.length >= pagesCount) {
+          customText = sentences[sentenceIdx];
+        }
       }
 
       const description = customText 

@@ -355,6 +355,76 @@ export default function App() {
                   </p>
                 </div>
 
+                {/* Painel de Edição Rápida do Roteiro Ativo */}
+                <div className="bg-art-card border border-art-border rounded p-6 shadow-3xs space-y-4 animate-fade-in">
+                  <div className="border-b border-art-border pb-3">
+                    <h3 className="text-xs font-mono font-bold text-art-charcoal uppercase tracking-wider">
+                      Identificação do Roteiro Ativo
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
+                        Título do Roteiro
+                      </label>
+                      <input
+                        type="text"
+                        value={activeProject.settings.title}
+                        onChange={(e) => {
+                          handleUpdateProject({
+                            ...activeProject,
+                            settings: {
+                              ...activeProject.settings,
+                              title: e.target.value
+                            }
+                          });
+                        }}
+                        className="w-full text-xs font-serif p-2.5 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
+                        Roteirista(s) / Autor(es)
+                      </label>
+                      <input
+                        type="text"
+                        value={activeProject.settings.author || ""}
+                        onChange={(e) => {
+                          handleUpdateProject({
+                            ...activeProject,
+                            settings: {
+                              ...activeProject.settings,
+                              author: e.target.value
+                            }
+                          });
+                        }}
+                        placeholder="Ex: Alan Moore, Neil Gaiman..."
+                        className="w-full text-xs font-serif p-2.5 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold text-stone-550 uppercase tracking-widest mb-1.5">
+                        Gênero Literário
+                      </label>
+                      <input
+                        type="text"
+                        value={activeProject.settings.genre}
+                        onChange={(e) => {
+                          handleUpdateProject({
+                            ...activeProject,
+                            settings: {
+                              ...activeProject.settings,
+                              genre: e.target.value
+                            }
+                          });
+                        }}
+                        className="w-full text-xs font-serif p-2.5 bg-art-sidebar/20 border border-art-border rounded focus:outline-none focus:border-art-charcoal text-art-charcoal"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Dashboard Grid Options */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Card 1: Novo Quadrinho */}

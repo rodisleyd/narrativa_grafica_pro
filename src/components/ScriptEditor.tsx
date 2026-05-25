@@ -29,7 +29,13 @@ export default function ScriptEditor({ project, onChange, onTriggerAi }: ScriptE
     if (!onTriggerAi || !panel.visualDescription?.trim()) return;
     setDescAiLoading(true);
     try {
-      const prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Reescreva e aprimore a descrição visual do quadro de quadrinho (HQ) abaixo.
+      const isPlaceholder = panel.visualDescription.includes("Rascunhe os primeiros movimentos");
+      const prompt = `Você é um assistente de roteiro de quadrinhos de alto nível. Reescreva, detalhe e aprimore a descrição visual do quadro de quadrinho (HQ) abaixo.
+
+CONTEXTO GERAL DO ROTEIRO:
+- Argumento Geral da História: "${project.settings.premise || "Não especificado"}"
+- Ritmo/Pacing desta Página: "${activePage?.rhythmNotes || "Não especificado"}"
+
 REGRAS CRÍTICAS DE RETORNO:
 - Retorne EXCLUSIVAMENTE o texto final da descrição visual aprimorada.
 - NÃO adicione saudações, introduções (ex: "Aqui está sua descrição"), explicações, justificativas ou notas didáticas de qualquer tipo.
@@ -40,8 +46,13 @@ REGRAS DE CONTEÚDO:
 2. TEMPO PRESENTE DO INDICATIVO: Toda a ação deve estar no presente (ex: "Manoel observa a chuva..." em vez de "observava").
 3. IMAGEM ESTÁTICA (CONGELADA): Descreva a cena como um único instante estático (fotografia). Nunca descreva uma sucessão temporal de ações (ex: em vez de "ela entra e senta", use "ela está sentada").
 4. MANTENHA A INTENÇÃO: Preserve a ideia principal, o clima e a intenção do roteiro original.
+${
+  isPlaceholder
+    ? `5. GERAÇÃO A PARTIR DO CONTEXTO: Como a descrição original é apenas um rascunho de placeholder genérico, use o "Argumento Geral" e principalmente o "Ritmo/Pacing desta Página" acima para sugerir e criar uma descrição visual específica de alta qualidade para este quadro.`
+    : `5. APERFEIÇOAMENTO: Melhore e dê mais robustez visual ao texto fornecido.`
+}
 
-Descrição original a ser reescrita:
+Descrição original a ser reescrita ou substituída:
 "${panel.visualDescription}"`;
 
       const result = await onTriggerAi("custom", { prompt });
